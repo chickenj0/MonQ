@@ -1,0 +1,48 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <complex>
+#include <qiskit/providers/ibmq/ibmqfactory.hpp>
+#include <qiskit/aqua/algorithms/shor/shor.hpp>
+
+using namespace std;
+using namespace qiskit;
+
+int main() {
+	// Enter your API token here
+	string apiToken = "ENTER_API_TOKEN_HERE";
+	
+	// Enable IBM Quantum Experience account
+	IBMQ::enable_account(apiToken);
+	
+	// Get the IBM Quantum provider
+	auto provider = IBMQ::get_provider("ibm-q");
+	
+	// Specifies the quantum device
+	auto backend = provider.get_backend("ibmq_qasm_simulator");
+	
+	cout << "\n Shors Algorithm" << endl;
+	cout << "--------------------" << endl;
+	cout << "\nExecuting...\n" << endl;
+
+	// Function to run Shor's algorithm 
+	// where 35 is the integer to be factored
+	auto factors = shor(35);
+
+	auto result_dict = factors.run(QuantumInstance(
+		backend, 1, false
+	));
+
+	// Get factors from results
+	vector<complex<double>> result = result_dict["factors"];
+
+	cout << "Result: ";
+	for (const auto &factor : result) {
+		cout << factor << " ";
+	}
+
+	cout << "\nPress any key to close" << endl;
+	cin.get();
+
+	return 0;
+}

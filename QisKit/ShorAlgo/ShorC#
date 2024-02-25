@@ -1,0 +1,60 @@
+using System;
+using IBM.Quantum.IBMQ;
+using IBM.Quantum.IBMQ.Runtime;
+using IBM.Quantum.IBMQ.Runtime.Jobs;
+using IBM.Quantum.IBMQ.Runtime.Utils;
+using System.Threading.Tasks;
+
+class GFG
+{
+	static async Task Main(string[] args)
+	{
+		// Enter your API token here
+		string apiToken = "ENTER API TOKEN HERE";
+
+		// Enable IBM Quantum Experience account
+		IBMQ.IBQAccountToken = apiToken;
+
+		// Get the IBM Quantum provider
+		IBMRuntime ibmRuntime = IBMQ.GetIBMRuntime();
+
+		// Specifies the quantum device
+		string backendName = "ibmq_qasm_simulator";
+
+		// Print a message
+		Console.WriteLine("\n Shor's Algorithm");
+		Console.WriteLine("--------------------");
+		Console.WriteLine("\nExecuting...\n");
+
+		// Function to run Shor's algorithm
+		// where 35 is the integer to be factored
+		int numberToFactorize = 35;
+
+		RunConfig runConfig = new RunConfigBuilder()
+				.Backend(backendName)
+				.Shots(1)
+				.Build();
+
+		QiskitRuntime shorRuntime = await ibmRuntime.RunAsync(
+			typeof(Shor).FullName,
+			typeof(RunConfig).FullName,
+			runConfig,
+			new object[] { numberToFactorize });
+
+		// Wait for the runtime to finish
+		await shorRuntime.AwaitCompletionAsync();
+
+		// Get the result from the runtime
+		RunResult runResult = shorRuntime.GetResult();
+		RunResultData resultData = runResult.GetData();
+
+		// Get factors from results
+		object[] result = (object[])resultData.Get("factors");
+
+		// Print the result
+		Console.WriteLine(result[0]);
+
+		// Print a message to close
+		Console.WriteLine("\nPress any key to close");
+	}
+}
